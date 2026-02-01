@@ -156,7 +156,7 @@ HAVING COUNT(CASE WHEN o.status IN ('entregado', 'pagado', 'enviado') THEN 1 END
 ORDER BY monto_total DESC;
 
 -- VERIFY 1: Ver análisis de desempeño de usuarios
-SELECT * FROM vista_analisis_desempeño_usuarios;
+SELECT * FROM vista_analisis_desempeno_usuarios;
 
 -- VERIFY 2: Confirmar que Ada tiene 1 orden entregada
 SELECT nombre, ordenes_entregadas, monto_total, clasificacion 

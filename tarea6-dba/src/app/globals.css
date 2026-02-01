@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.justify-content{
+  display: flex;
+  justify-content: center; 
+}
+.justify-block{
+  display: block;
+  justify-content: center; 
+}
+
+.background-style{
+  background: #c92020;
+}
+.background-white{
+  background: #d1d1d1;
+}

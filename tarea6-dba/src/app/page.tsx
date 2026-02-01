@@ -5,7 +5,7 @@ export default function Home() {
     <div>
      Esta va a ser la pagina inicial
 
-      <Link href="/reports"
+      <Link href="/Dashboard/Home"
       >ir a reportes</Link>
       
     </div>

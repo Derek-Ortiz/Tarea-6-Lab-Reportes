@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tarea6_postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: actividad_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d:ro 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d actividad_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - tarea6-network
+
+  
+  app:
+    build:
+      context: ./tarea6-dba
+      dockerfile: Dockerfile
+    container_name: tarea6_app
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: actividad_db
+      DB_USER: tarea6
+      DB_PASSWORD: t4r34s313s
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tarea6-dba:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+    networks:
+      - tarea6-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tarea6_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - tarea6-network
+
+volumes:
+  postgres_data:
+
+networks:
+  tarea6-network:
+    driver: bridge

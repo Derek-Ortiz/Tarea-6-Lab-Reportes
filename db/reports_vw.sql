@@ -138,7 +138,7 @@ View numero : 5
 -- Por qué usa GROUP BY/HAVING: Agrupa por usuario y filtra los que tienen órdenes entregadas
 */
 
-CREATE VIEW vista_analisis_desempeño_usuarios AS
+CREATE VIEW vista_analisis_desempeno_usuarios AS
 SELECT 
     u.nombre,
     COUNT(CASE WHEN o.status = 'entregado' THEN 1 END) AS ordenes_entregadas,

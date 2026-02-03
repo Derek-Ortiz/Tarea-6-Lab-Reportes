@@ -16,10 +16,10 @@ import {
 
 export async function getVistaCatPromedio(rawFilters?: Partial<CategoriaFilter>) {
     try {
-        // Validar filtros con Zod
+        
         const filters = categoriaFilterSchema.parse(rawFilters || {});
         
-        // Whitelist de columnas permitidas para ORDER BY
+        
         const orderByWhitelist: Record<string, string> = {
             'promedio_precio': 'promedio_precio',
             'cantidad_productos': 'cantidad_productos',
@@ -29,7 +29,7 @@ export async function getVistaCatPromedio(rawFilters?: Partial<CategoriaFilter>)
         const orderColumn = orderByWhitelist[filters.orderBy] || 'promedio_precio';
         const orderDirection = filters.orderDir === 'ASC' ? 'ASC' : 'DESC';
         
-        // Query parametrizada - Solo SELECT desde VIEW
+        
         const result = await pool.query(
             `SELECT * FROM vista_cat_promedio 
              WHERE cantidad_productos >= $1
@@ -37,7 +37,7 @@ export async function getVistaCatPromedio(rawFilters?: Partial<CategoriaFilter>)
             [filters.minProductos]
         );
         
-        // Calcular dato destacado
+        
         const destacado = result.rows.length > 0 ? {
             categoriaConMayorPromedio: result.rows[0]?.nombre,
             promedioMasAlto: result.rows[0]?.promedio_redondeado,
@@ -53,7 +53,7 @@ export async function getVistaCatPromedio(rawFilters?: Partial<CategoriaFilter>)
 
 export async function getVistaRankingUsuarios(rawFilters?: Partial<RankingFilter>) {
     try {
-        // Validar filtros con Zod
+        
         const filters = rankingFilterSchema.parse(rawFilters || {});
         
         const offset = (filters.page - 1) * filters.limit;
@@ -61,7 +61,7 @@ export async function getVistaRankingUsuarios(rawFilters?: Partial<RankingFilter
         const whereConditions: string[] = [];
         let paramIndex = 1;
         
-        // Construir condiciones WHERE de forma segura
+        
         if (filters.nivelComprador && filters.nivelComprador !== 'todos') {
             whereConditions.push(`nivel_comprador = $${paramIndex}`);
             params.push(filters.nivelComprador);
@@ -105,7 +105,7 @@ export async function getVistaRankingUsuarios(rawFilters?: Partial<RankingFilter
         const total = parseInt(countResult.rows[0]?.total || '0');
         const totalPages = Math.ceil(total / filters.limit);
         
-        // Dato destacado
+        
         const topUserQuery = await pool.query(
             'SELECT nombre, gasto_total, nivel_comprador FROM vista_ranking_usuarios_gastos ORDER BY gasto_total DESC LIMIT 1'
         );
@@ -136,19 +136,11 @@ export async function getVistaOrdenesPorStatus(rawFilters?: Partial<OrdenesStatu
     try {
         const filters = ordenesStatusFilterSchema.parse(rawFilters || {});
         
-        let query = 'SELECT * FROM vista_ordenes_por_status';
+        const query = 'SELECT * FROM vista_ordenes_por_status';
         const params: string[] = [];
-        
-        if (filters.status && filters.status !== 'todos') {
-            query += ' WHERE status = $1';
-            params.push(filters.status);
-        }
-        
-        query += ' ORDER BY cantidad_ordenes DESC';
         
         const result = await pool.query(query, params);
         
-        // Calcular datos destacados
         const totalOrdenes = result.rows.reduce((sum, row) => sum + parseInt(row.cantidad_ordenes), 0);
         const montoTotal = result.rows.reduce((sum, row) => sum + parseFloat(row.monto_total || 0), 0);
         const statusMasComun = result.rows[0];
@@ -208,6 +200,8 @@ export async function getVistaProductosMasVendidos(rawFilters?: Partial<Producto
             pool.query(dataQuery, params),
             pool.query(countQuery, countParams)
         ]);
+        
+        
         
         const total = parseInt(countResult.rows[0]?.total || '0');
         const totalPages = Math.ceil(total / filters.limit);

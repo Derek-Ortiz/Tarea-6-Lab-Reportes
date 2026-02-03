@@ -25,7 +25,7 @@ export default async function Report5Page({
                 Análisis detallado del desempeño de usuarios mostrando órdenes entregadas, canceladas y monto acumulado.
             </p>
             
-            {/* Dato Destacado */}
+            
             {destacado && (
                 <div className="bg-teal-50 border-l-4 border-teal-500 p-4 mb-6">
                     <h3 className="font-bold text-teal-800">📊 Dato Destacado</h3>
@@ -41,7 +41,6 @@ export default async function Report5Page({
                 </div>
             )}
             
-            {/* Filtros */}
             <div className="mb-4 flex gap-2 flex-wrap">
                 <span className="font-medium">Filtrar por clasificación:</span>
                 {['todos', 'Cliente Activo', 'Cliente Inactivo'].map((c) => (

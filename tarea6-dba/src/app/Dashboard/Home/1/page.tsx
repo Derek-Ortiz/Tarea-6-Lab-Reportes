@@ -16,7 +16,7 @@ export default async function Report1Page() {
                 Muestra el promedio de precios agrupado por categoría, filtrando categorías con más de 2 productos.
             </p>
             
-            {/* KPI Destacado */}
+            
             {destacado && (
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-6 mb-6 shadow-lg">
                     <p className="text-sm uppercase tracking-wide opacity-80">Promedio más alto</p>

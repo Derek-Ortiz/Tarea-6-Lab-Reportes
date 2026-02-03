@@ -28,7 +28,7 @@ export default async function Report4Page({
                 Ranking de productos ordenados por cantidad vendida con clasificación de popularidad.
             </p>
             
-            {/* KPI Destacado */}
+            
             {destacado && (
                 <div className="bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-lg p-6 mb-6 shadow-lg">
                     <p className="text-sm uppercase tracking-wide opacity-80">Unidades vendidas (Top 1)</p>
@@ -38,7 +38,7 @@ export default async function Report4Page({
                 </div>
             )}
             
-            {/* Filtros */}
+            
             <div className="mb-4 flex gap-2 flex-wrap">
                 <span className="font-medium">Filtrar por popularidad:</span>
                 {['todos', 'Muy Popular', 'Popular'].map((p) => (
@@ -82,8 +82,7 @@ export default async function Report4Page({
                     </tbody>
                 </table>
             </div>
-            
-            {/* Paginación */}
+  
             {pagination && (
                 <div className="mt-4 flex justify-center gap-2">
                     {pagination.page > 1 && (

@@ -28,7 +28,7 @@ export default async function Report2Page({
                 Ranking de usuarios ordenado por total gastado con clasificación de nivel (Premium, Gold, Silver).
             </p>
             
-            {/* KPI Destacado */}
+            
             {destacado && (
                 <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg p-6 mb-6 shadow-lg">
                     <p className="text-sm uppercase tracking-wide opacity-80">Mayor gasto total</p>
@@ -38,7 +38,7 @@ export default async function Report2Page({
                 </div>
             )}
             
-            {/* Filtros */}
+            
             <div className="mb-4 flex gap-2 flex-wrap">
                 <span className="font-medium">Filtrar por nivel:</span>
                 {['todos', 'Premium', 'Gold', 'Silver'].map((n) => (
@@ -85,7 +85,6 @@ export default async function Report2Page({
                 </table>
             </div>
             
-            {/* Paginación */}
             <div className="mt-4 flex justify-center gap-2">
                 {pagination.page > 1 && (
                     <Link 

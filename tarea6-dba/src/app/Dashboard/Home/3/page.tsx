@@ -16,7 +16,7 @@ export default async function Report3Page() {
                 Distribución de órdenes por estado mostrando cantidad, monto total y porcentaje de distribución.
             </p>
             
-            {/* KPI Destacado */}
+            
             {destacado && (
                 <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg p-6 mb-6 shadow-lg">
                     <p className="text-sm uppercase tracking-wide opacity-80">Status más frecuente</p>

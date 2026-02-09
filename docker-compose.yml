@@ -6,17 +6,19 @@ services:
     container_name: tarea6_postgres
     hostname: postgres
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-      POSTGRES_DB: actividad_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5433:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d:ro 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d actividad_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER} -d $${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,12 +36,12 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: actividad_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER_VW}
+      DB_PASSWORD: ${DB_PASSWORD_VW}
       NODE_ENV: development
     ports:
-      - "3000:3000"
+      - "${DB_PORT_WEB}:3000"
     volumes:
       - ./tarea6-dba:/app
       - /app/node_modules

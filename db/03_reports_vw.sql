@@ -160,5 +160,5 @@ SELECT * FROM vista_analisis_desempeno_usuarios;
 
 -- VERIFY 2: Confirmar que Ada tiene 1 orden entregada
 SELECT nombre, ordenes_entregadas, monto_total, clasificacion 
-FROM vista_analisis_desempeño_usuarios 
+FROM vista_analisis_desempeno_usuarios 
 WHERE nombre = 'Ada Lovelace';  

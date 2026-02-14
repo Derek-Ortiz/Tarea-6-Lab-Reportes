@@ -1,4 +1,4 @@
-import { getVistaOrdenesPorStatus } from "@/app/actions/reportes";
+import { getVistaOrdenesPorStatus } from "@/lib/reportes";
 import Link from "next/link";
 
 export default async function Report3Page() {

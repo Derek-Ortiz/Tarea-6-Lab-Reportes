@@ -1,4 +1,4 @@
-import { getVistaAnalisisDesempeno } from "@/app/actions/reportes";
+import { getVistaAnalisisDesempeno } from "@/lib/reportes";
 import Link from "next/link";
 
 export default async function Report5Page({

@@ -1,4 +1,4 @@
-import { getVistaCatPromedio } from "@/app/actions/reportes";
+import { getVistaCatPromedio } from "@/lib/reportes";
 import Link from "next/link";
 
 export default async function Report1Page() {

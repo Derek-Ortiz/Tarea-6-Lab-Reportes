@@ -1,4 +1,4 @@
-import { getVistaProductosMasVendidos } from "@/app/actions/reportes";
+import { getVistaProductosMasVendidos } from "@/lib/reportes";
 import Link from "next/link";
 
 export default async function Report4Page({

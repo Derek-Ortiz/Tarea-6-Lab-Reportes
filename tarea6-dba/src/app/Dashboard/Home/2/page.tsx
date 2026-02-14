@@ -1,4 +1,4 @@
-import { getVistaRankingUsuarios } from "@/app/actions/reportes";
+import { getVistaRankingUsuarios } from "@/lib/reportes";
 import Link from "next/link";
 
 export default async function Report2Page({

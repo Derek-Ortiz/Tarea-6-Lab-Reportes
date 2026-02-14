@@ -121,16 +121,18 @@ GROUP BY c.id, c.nombre;
 
 **Plan de ejecución:**
 ```
-HashAggregate  (cost=15.49..15.69 rows=16 width=262) (actual time=3.400..3.405 rows=3 loops=1)
+ HashAggregate  (cost=15.49..15.69 rows=16 width=262) (actual time=5.165..5.244 rows=3 loops=1)
    Group Key: c.id
    Batches: 1  Memory Usage: 24kB
-   ->  Hash Join  (cost=1.36..15.37 rows=16 width=242) (actual time=1.538..1.546 rows=16 loops=1)
+   ->  Hash Join  (cost=1.36..15.37 rows=16 width=242) (actual time=2.019..2.057 rows=16 loops=1)
          Hash Cond: (c.id = p.categoria_id)
-         ->  Seq Scan on categorias c  (cost=0.00..12.80 rows=280 width=222) (actual time=0.535..0.538 rows=5 loops=1)
-         ->  Hash  (cost=1.16..1.16 rows=16 width=24) (actual time=0.938..0.939 rows=16 loops=1)
-               ->  Seq Scan on productos p  (cost=0.00..1.16 rows=16 width=24) (actual time=0.877..0.881 rows=16 loops=1)
-Planning Time: 22.304 ms
-Execution Time: 5.055 ms
+         ->  Seq Scan on categorias c  (cost=0.00..12.80 rows=280 width=222) (actual time=0.318..0.346 rows=5 loops=1)
+         ->  Hash  (cost=1.16..1.16 rows=16 width=24) (actual time=1.551..1.554 rows=16 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 9kB
+               ->  Seq Scan on productos p  (cost=0.00..1.16 rows=16 width=24) (actual time=1.370..1.377 rows=16 loops=1)
+ Planning Time: 36.162 ms
+ Execution Time: 10.501 ms
+(11 rows)
 ```
 
 **Análisis:** El índice `idx_productos_categoria_id` permite que el HashJoin se ejecute en 1.546ms total. Sin él, se necesitaría un Seq Scan completo de productos por cada categoría. Con solo 16 productos, el impacto es mínimo, pero en tablas grandes este índice es crítico.
@@ -148,16 +150,18 @@ GROUP BY p.id, p.nombre;
 
 **Plan de ejecución:**
 ```
-HashAggregate  (cost=12.47..13.22 rows=60 width=262) (actual time=2.920..2.927 rows=7 loops=1)
-  Group Key: u.id
-  Batches: 1  Memory Usage: 24kB
-  ->  Hash Left Join  (cost=1.14..12.02 rows=60 width=242) (actual time=2.835..2.884 rows=7 loops=1)
-       Hash Cond: (u.id = o.usuario_id)
-       ->  Seq Scan on usuarios u  (cost=0.00..10.60 rows=60 width=222) (actual time=0.710..0.747 rows=7 loops=1)
-       ->  Hash  (cost=1.06..1.06 rows=6 width=24) (actual time=2.068..2.069 rows=6 loops=1)
-            ->  Seq Scan on ordenes o  (cost=0.00..1.06 rows=6 width=24) (actual time=1.987..1.993 rows=6 loops=1)
-Planning Time: 19.793 ms
-Execution Time: 3.132 ms
+ HashAggregate  (cost=2.59..2.73 rows=11 width=462) (actual time=1.260..1.266 rows=10 loops=1)
+   Group Key: p.id
+   Batches: 1  Memory Usage: 24kB
+   ->  Hash Join  (cost=1.36..2.51 rows=11 width=442) (actual time=1.190..1.197 rows=11 loops=1)
+         Hash Cond: (od.producto_id = p.id)
+         ->  Seq Scan on orden_detalles od  (cost=0.00..1.11 rows=11 width=24) (actual time=1.115..1.117 rows=11 loops=1)
+         ->  Hash  (cost=1.16..1.16 rows=16 width=422) (actual time=0.047..0.048 rows=16 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 9kB
+               ->  Seq Scan on productos p  (cost=0.00..1.16 rows=16 width=422) (actual time=0.014..0.016 rows=16 loops=1)
+ Planning Time: 8.874 ms
+ Execution Time: 1.420 ms
+(11 rows)
 ```
 
 **Análisis:** El índice `idx_ordenes_usuario_id` optimiza el LEFT JOIN. El optimizer elige HashJoin (cost 12.47) en lugar de Nested Loop. Execution Time de 3.132ms es eficiente incluso con la aggregación por producto.

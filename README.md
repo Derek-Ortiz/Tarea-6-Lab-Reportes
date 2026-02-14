@@ -18,18 +18,57 @@ Entrega individual. Este repositorio incluye la base de datos con VIEWS y la app
 
 ### Requisitos previos
 
-1. Copiar `.env.example` a `.env` (o usar los valores por defecto):
-```bash
-cp .env.example .env
-```
+- **Docker Desktop** (versión 20.10 o superior)
+- **Docker Compose** (versión 1.29 o superior, o integrado en Docker Desktop)
+- **Git** (para clonar el repositorio)
 
-2. Editar `.env` si es necesario (los valores por defecto funcionan para desarrollo).
-
-### Iniciar el proyecto
+### Opción 1: Ejecución rápida (RECOMENDADA)
 
 ```bash
+# El .env se crea automáticamente desde .env.example si no existe
 docker compose up --build
 ```
+
+A continuación, accede a:
+- **Aplicación**: http://localhost:3000
+- **PgAdmin**: http://localhost:5050 (admin@admin.com / admin)
+
+### Opción 2: Con validaciones previas
+
+```bash
+# Ejecutar validaciones primero
+bash scripts/validate.sh
+
+# Luego iniciar
+docker compose up --build
+```
+
+### Opción 3: Usando el script principal (Linux/Mac)
+
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### Configurar variables (OPCIONAL)
+
+El proyecto incluye un `.env.example` preconfigurado que funciona correctamente. Si lo necesitas, copia y personaliza:
+
+```bash
+cp .env.example .env
+# Editar .env si es necesario
+```
+
+**Variables importantes:**
+- `DB_USER`: Usuario admin de PostgreSQL (default: `postgres`)
+- `DB_PASSWORD`: Contraseña del admin (default: `postgres123`)
+- `DB_NAME`: Nombre de la base de datos (default: `actividad_db`)
+- `DB_USER_VW`: Usuario de la aplicación (default: `tarea6`)
+- `DB_PASSWORD_VW`: Contraseña de la aplicación (default: `t4r34s313s`)
+- `DB_PORT`: Puerto local de PostgreSQL (default: `5433`)
+- `DB_PORT_WEB`: Puerto de la aplicación (default: `3000`)
+
+⚠️ **IMPORTANTE:** El archivo `.gitattributes` en la raíz es crítico para que los scripts bash se cloben con saltos de línea Unix (LF). Si experimentas errores de "bad interpreter", verifica que este archivo existe en el repositorio.
 
 
 
@@ -199,4 +238,155 @@ psql -h localhost -U postgres -d actividad_db -p 5433 -f db/verify.sql
 
 - **Cambios en `.env`:** Requiere `docker compose down -v` + `docker compose up --build`
 - **Hot reload en Next.js:** Automático con volumes en docker-compose
-- **pgAdmin:** Excelente para queries ad-hoc y debugging; ya configurado en compose
+- **pgAdmin:** Excelente para queries ad-hoc y debugging; ya configurado en compose- **Logs:** Usa `docker compose logs -f` para todas las salidas o `docker compose logs -f app` para solo la app
+
+## 🐛 Troubleshooting
+
+### Error: "bad interpreter" o "No such file or directory"
+
+**Causa:** El archivo `db/00_init.sh` tiene saltos de línea de Windows (CRLF) en lugar de Unix (LF).
+
+**Solución:**
+```bash
+# macOS/Linux:
+dos2unix db/00_init.sh
+
+# O manualmente (funciona en cualquier sistema):
+# PowerShell (Windows):
+(Get-Content db/00_init.sh -Raw) -replace "`r`n", "`n" | Set-Content db/00_init.sh
+
+# Bash (Windows con Git Bash):
+sed -i 's/\r$//' db/00_init.sh
+```
+
+Luego reinicia:
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+**Prevención:** El archivo `.gitattributes` debería prevenir esto automáticamente en clones futuros.
+
+---
+
+### Error: "password authentication failed for user"
+
+**Causa:** Las variables de entorno no se están cargando desde `.env`.
+
+**Solución:**
+1. Verifica que `.env` existe:
+   ```bash
+   ls -la .env
+   ```
+
+2. Si no existe, créalo desde el ejemplo:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Verifica contenido básico:
+   ```bash
+   cat .env
+   ```
+
+4. Limpia y reinicia:
+   ```bash
+   docker compose down -v
+   docker compose up --build
+   ```
+
+---
+
+### Error: "Port already in use"
+
+**Causa:** Los puertos 3000, 5050 o 5433 ya están en uso.
+
+**Solución:** Edita `.env` y cambia los puertos:
+```env
+DB_PORT=5434          # Cambiar de 5433
+DB_PORT_WEB=3001      # Cambiar de 3000
+```
+
+Luego reinicia:
+```bash
+docker compose down
+docker compose up --build
+```
+
+---
+
+### Error: "Connection refused"
+
+**Causa:** El contenedor PostgreSQL aún no estuá listo.
+
+**Solución:** El healthcheck espera hasta 30 segundos. Si ves este error:
+
+1. Espera un poco más
+2. Verifica logs:
+   ```bash
+   docker compose logs postgres
+   ```
+
+3. Si los logs muestran errores de SQL, ejecuta validaciones:
+   ```bash
+   bash scripts/validate.sh
+   ```
+
+---
+
+### Error: "No arguments provided" en el script validate.sh
+
+**Causa:** El script no tiene permisos de ejecución o el shell intérprete es incorrecto.
+
+**Solución:**
+```bash
+# Hacer ejecutable
+chmod +x scripts/validate.sh
+
+# Ejecutar explícitamente:
+bash scripts/validate.sh
+```
+
+---
+
+### Database corrupta o mal inicializada
+
+**Causa:** El volumen de Docker tiene datos viejos.
+
+**Solución completa:**
+```bash
+# Detener y ELIMINAR volúmenes
+docker compose down -v
+
+# Limpiar contenedores residuales (si es necesario)
+docker rm -f tarea6_postgres tarea6_app tarea6_pgadmin 2>/dev/null || true
+
+# Reiniciar completamente
+docker compose up --build
+```
+
+---
+
+### Verificar que todo esté conectado correctamente
+
+```bash
+# Ver si los contenedores están activos
+docker compose ps
+
+# Ver logs de postgres
+docker compose logs postgres
+
+# Ver logs de app
+docker compose logs app
+
+# Entrar a postgres desde la CLI
+docker compose exec postgres psql -U postgres -d actividad_db -c "SELECT 1"
+```
+
+---
+
+### Más información
+
+- Ver `QUICKSTART.md` para guía rápida
+- Ver `SECURE_INIT_FLOW.md` para detalles técnicos de seguridad
+- Ejecutar `scripts/validate.sh` para diagnóstico automático

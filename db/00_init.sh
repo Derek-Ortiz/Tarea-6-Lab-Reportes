@@ -28,14 +28,14 @@ for file in $SQL_FILES; do
         echo "Ejecutando: $file"
         
         if [ "$file" = "04_roles.sql" ]; then
-            # Para 04_roles.sql, hacer sustitución de variables
-            echo "  Sustituyendo variables: app_user=$DB_USER_VW, app_db=$DB_NAME"
+            # Para 04_roles.sql, hacer sustitución de variables con sed
+            echo "  Sustituyendo variables: APP_USER=$DB_USER_VW, APP_PASSWORD=$DB_PASSWORD_VW, APP_DB=$DB_NAME"
             
             # Crear archivo temporal con variables sustituidas
             sed \
-                -e "s/current_setting('app_user')/'$DB_USER_VW'/g" \
-                -e "s/current_setting('app_password')/'$DB_PASSWORD_VW'/g" \
-                -e "s/current_setting('app_db')/'$DB_NAME'/g" \
+                -e "s/{APP_USER}/$DB_USER_VW/g" \
+                -e "s/{APP_PASSWORD}/$DB_PASSWORD_VW/g" \
+                -e "s/{APP_DB}/$DB_NAME/g" \
                 "$filepath" > /tmp/04_roles_rendered.sql
             
             psql -v ON_ERROR_STOP=1 --username "$DB_USER" --dbname "$DB_NAME" -f /tmp/04_roles_rendered.sql

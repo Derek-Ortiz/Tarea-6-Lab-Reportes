@@ -31,10 +31,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-**Servicios:**
-- PostgreSQL en `localhost:5433` (usuario: `postgres`, contraseña: `postgres123`)
-- App Next.js en `http://localhost:3000`
-- pgAdmin en `http://localhost:5050` (usuario: `admin@admin.com`, contraseña: `admin`)
+
 
 ### Flujo de inicialización segura
 
@@ -66,6 +63,48 @@ El script `db/00_init.sh` maneja la inyección de variables de entorno sin expon
 - `vista_ordenes_por_status` - GROUP BY con HAVING
 - `vista_productos_mas_vendidos` - Ranking con SUM
 - `vista_analisis_desempeno_usuarios` - CTE y Window Functions
+
+## Grain de las VIEWS
+
+### 1. Ranking de Usuarios por Gasto (`vista_ranking_usuarios_gastos`)
+
+**Grain:** 1 fila = 1 usuario
+- **Métricas:** Total de órdenes, total gastado, promedio por orden, ranking por gasto (RANK), nivel de comprador
+- **KPI:** Total gastado acumulado por usuarios frecuentes
+- **Parámetros:** Sin filtros ni paginación
+- **Función avanzada:** ROW_NUMBER() para ranking dinámico, CASE WHEN para clasificación de nivel (Premium/Gold/Silver)
+
+### 2. Promedio de Precios por Categoría (`vista_cat_promedio`)
+
+**Grain:** 1 fila = 1 categoría
+- **Métricas:** Cantidad de productos, promedio de precio, promedio redondeado a 2 decimales
+- **KPI:** Análisis de precios por línea de negocio
+- **Parámetros:** Filtrable por cantidad mínima de productos (WHERE cantidad_productos >= ?)
+- **Función avanzada:** AVG() con ROUND() y CASE WHEN para métricas condicionales
+
+### 3. Órdenes por Estado (`vista_ordenes_por_status`)
+
+**Grain:** 1 fila = 1 status de orden
+- **Métricas:** Cantidad de órdenes, monto total, porcentaje de distribución
+- **KPI:** Visibilidad del pipeline de ventas y estado de entregas
+- **Parámetros:** Filtrable por status específico
+- **Función avanzada:** GROUP BY con HAVING, SUM() para agregaciones, cálculo de porcentajes
+
+### 4. Productos Más Vendidos (`vista_productos_mas_vendidos`)
+
+**Grain:** 1 fila = 1 producto
+- **Métricas:** Posición en ranking, cantidad vendida, ingresos totales, nivel de popularidad (Popular/Normal)
+- **KPI:** Análisis de productos estrella y rendimiento de SKUs
+- **Parámetros:** Filtrable por rango de precios (WHERE precio BETWEEN ? AND ?)
+- **Función avanzada:** ROW_NUMBER() para ranking de ventas, CASE WHEN para clasificación de popularidad
+
+### 5. Análisis de Desempeño de Usuarios (`vista_analisis_desempeno_usuarios`)
+
+**Grain:** 1 fila = 1 usuario
+- **Métricas:** Órdenes entregadas, órdenes canceladas, monto total, monto acumulado, clasificación (Cliente Activo/Inactivo)
+- **KPI:** Segmentación de clientes por comportamiento de compra
+- **Parámetros:** Sin filtros ni paginación directa
+- **Función avanzada:** CTE (WITH clauses), Window Functions para monto acumulado, CASE WHEN para clasificación de cliente
 
 ## Performance Evidence (EXPLAIN ANALYZE)
 

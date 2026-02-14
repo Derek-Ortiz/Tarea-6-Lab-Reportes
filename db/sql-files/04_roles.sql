@@ -7,18 +7,7 @@
 -- Crear usuario de aplicación (si no existe)
 -- {APP_USER}, {APP_PASSWORD}, {APP_DB} se reemplazan por shell
 
-DO $$
-BEGIN
-    -- Crear usuario si no existe (manejo de excepciones)
-    EXECUTE format('CREATE USER %I WITH PASSWORD %L', 
-        '{APP_USER}', 
-        '{APP_PASSWORD}');
-EXCEPTION 
-    WHEN duplicate_object THEN
-        -- Usuario ya existe, nada que hacer
-        NULL;
-END
-$$;
+CREATE USER {APP_USER} WITH PASSWORD '{APP_PASSWORD}';
 
 -- Configurar permisos mínimos
 ALTER USER {APP_USER} NOCREATEDB NOCREATEROLE NOSUPERUSER;

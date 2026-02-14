@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 set -e
 
 echo "Iniciando configuracion de base de datos..."
@@ -31,10 +31,13 @@ for file in $SQL_FILES; do
             # Para 04_roles.sql, hacer sustitución de variables con sed
             echo "  Sustituyendo variables: APP_USER=$DB_USER_VW, APP_PASSWORD=$DB_PASSWORD_VW, APP_DB=$DB_NAME"
             
+            # Escapar los valores especiales para sed
+            ESCAPED_PASSWORD=$(echo "$DB_PASSWORD_VW" | sed 's/[&/\]/\\&/g')
+            
             # Crear archivo temporal con variables sustituidas
             sed \
                 -e "s/{APP_USER}/$DB_USER_VW/g" \
-                -e "s/{APP_PASSWORD}/$DB_PASSWORD_VW/g" \
+                -e "s/{APP_PASSWORD}/$ESCAPED_PASSWORD/g" \
                 -e "s/{APP_DB}/$DB_NAME/g" \
                 "$filepath" > /tmp/04_roles_rendered.sql
             

@@ -1,0 +1,14 @@
+# Forzar LF (Unix) para archivos shell en todos los sistemas
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Forzar LF para Docker
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+
+# Forzar LF para SQL
+*.sql text eol=lf
+
+# Archivos de configuración
+.env* text eol=lf
+.gitignore text eol=lf
